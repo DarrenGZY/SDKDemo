@@ -1,11 +1,14 @@
 #pragma once
+
+#include "../Types.h"
 class Plane
 {
 public:
-	Plane();
+	Plane(D3DCONTEXT context);
 
-	Create(float x1, float y1, float z1, float x2, float y2, float z2, const wchar_t *filename);
-	Render();
+	void Create(float x1, float y1, float z1, float x2, float y2, float z2, const wchar_t *filename);
+	void Render();
+	void SetShader(ID3D11VertexShader* vs, ID3D11PixelShader* ps);
 
 	~Plane();
 

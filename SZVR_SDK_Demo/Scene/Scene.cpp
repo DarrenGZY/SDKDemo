@@ -232,6 +232,18 @@ void SceneManager::InitShaders()
 	{
 		return;
 	}
+
+	hr = g_device->CreateVertexShader(g_TexVS, ARRAYSIZE(g_TexVS), nullptr, &g_vertexShader);
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	hr = g_device->CreatePixelShader(g_TexPS, ARRAYSIZE(g_TexPS), nullptr, &g_pixelShader);
+	if (FAILED(hr))
+	{
+		return;
+	}
 }
 
 
@@ -246,7 +258,7 @@ void SceneManager::Render(HWND hwnd)
 
 	XMMATRIX matView, matProj;
 
-	static XMVECTOR camPos = XMVectorSet(0.0f, 0.0f, -5.0f, 0.0f);
+	static XMVECTOR camPos = XMVectorSet(0.0f, 2.0f, -5.0f, 0.0f);
 	UpdateCameraPosition(camPos);
 
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
@@ -288,7 +300,7 @@ void SceneManager::Render(HWND hwnd)
 
 D3DCONTEXT SceneManager::GetContext()
 {
-	return{ g_device, g_devcontext, g_vertexShader, g_pixelShader };
+	return{ g_device, g_devcontext, g_vertexShader, g_pixelShader};
 }
 
 void SceneManager::SafeRelease(IUnknown *object)

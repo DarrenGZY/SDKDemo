@@ -5,6 +5,8 @@
 #include "Util/WICTextureLoader.h"
 #include "PixelShader.h"
 #include "VertexShader.h"
+#include "TexVShader.h"
+#include "TexPShader.h"
 
 using namespace DirectX;
 
@@ -24,6 +26,12 @@ typedef struct _SOLIDVERTEX
 	XMFLOAT3 Pos;
 	XMFLOAT4 Color;
 }SOLIDVERTEX;
+
+typedef struct _TEXVERTEX
+{
+	XMFLOAT3 Pos;
+	XMFLOAT2 Tex;
+}TEXVERTEX;
 
 typedef struct _D3DCONTEXT
 {
