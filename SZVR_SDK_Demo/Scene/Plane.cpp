@@ -3,12 +3,15 @@
 
 #define CUBE_INDICES 36
 Plane::Plane(D3DCONTEXT context)
+:
+m_ibuffer(nullptr),
+m_vbuffer(nullptr),
+m_inputLayout(nullptr),
+m_SRV(nullptr),
+m_vShader(nullptr),
+m_pShader(nullptr)
 {
 	m_context = context;
-	m_ibuffer = nullptr;
-	m_vbuffer = nullptr;
-	m_inputLayout = nullptr;
-	m_SRV = nullptr;
 }
 
 void Plane::Create(float x1, float y1, float z1, float x2, float y2, float z2, const wchar_t *filename)
@@ -111,13 +114,33 @@ void Plane::Create(float x1, float y1, float z1, float x2, float y2, float z2, c
 	InitData.pSysMem = indices;
 
 	m_context.device->CreateBuffer(&BufferDesc, &InitData, &m_ibuffer);
+
+	HRESULT hr	= CreateWICTextureFromFile(m_context.device, m_context.devcontext, filename, nullptr, &m_SRV, NULL);
+	
 }
 
 
-void Plane::SetShader(ID3D11VertexShader* vs, ID3D11PixelShader* ps)
+void Plane::Render()
 {
-	m_context.devcontext->VSSetShader(vs, nullptr, NULL);
-	m_context.devcontext->PSSetShader(ps, nullptr, NULL);
+	
+	m_context.devcontext->IASetInputLayout(m_inputLayout);
+	UINT stride = sizeof(TEXVERTEX);
+	UINT offset = 0;
+	m_context.devcontext->IASetVertexBuffers(0, 1, &m_vbuffer, &stride, &offset);
+	m_context.devcontext->IASetIndexBuffer(m_ibuffer, DXGI_FORMAT_R32_UINT, 0);
+	m_context.devcontext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	m_context.devcontext->VSSetShader(m_vShader, nullptr, NULL);
+	m_context.devcontext->PSSetShader(m_pShader, nullptr, NULL);
+	m_context.devcontext->PSSetShaderResources(0, 1, &m_SRV);
+	m_context.devcontext->DrawIndexed(CUBE_INDICES, 0, 0);
+
+}
+
+void Plane::SetShaders(ID3D11VertexShader* vs, ID3D11PixelShader* ps)
+{
+	m_pShader = ps;
+	m_vShader = vs;
 }
 
 Plane::~Plane()

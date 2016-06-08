@@ -212,9 +212,27 @@ void SceneManager::Init(HWND hwnd)
 
 void SceneManager::InitGraphics()
 {
-	Cube* cube = new Cube(GetContext());
+	
+	Model* plane = new Plane(GetContext());
+	plane->Create(-10.0f, -1.0f, 10.0f, 10.0f, -1.1f, -10.0f, L"floor.jpg");
+	plane->SetShaders(g_TexVShader, g_TexPShader);
+	models.push_back(plane);
+
+	Model* wall_left = new Plane(GetContext());
+	wall_left->Create(-10.1f, 10.0f, 10.0f, -10.0f, -1.1f, -10.0f, L"wall.jpg");
+	wall_left->SetShaders(g_TexVShader, g_TexPShader);
+	models.push_back(wall_left);
+
+	Model* wall_right = new Plane(GetContext());
+	wall_right->Create(10.0f, 10.0f, 10.0f, 10.1f, -1.1f, -10.0f, L"wall.jpg");
+	wall_right->SetShaders(g_TexVShader, g_TexPShader);
+	models.push_back(wall_right);
+
+	Model* cube = new Cube(GetContext());
 	cube->Create(-1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, XMFLOAT4(0.0f, 0.2f, 0.4f, 1.0f));
-	cubes.push_back(cube);
+	cube->SetShaders(g_vertexShader, g_pixelShader); 
+	models.push_back(cube);
+
 }
 
 void SceneManager::InitShaders()
@@ -233,13 +251,13 @@ void SceneManager::InitShaders()
 		return;
 	}
 
-	hr = g_device->CreateVertexShader(g_TexVS, ARRAYSIZE(g_TexVS), nullptr, &g_vertexShader);
+	hr = g_device->CreateVertexShader(g_TexVS, ARRAYSIZE(g_TexVS), nullptr, &g_TexVShader);
 	if (FAILED(hr))
 	{
 		return;
 	}
 
-	hr = g_device->CreatePixelShader(g_TexPS, ARRAYSIZE(g_TexPS), nullptr, &g_pixelShader);
+	hr = g_device->CreatePixelShader(g_TexPS, ARRAYSIZE(g_TexPS), nullptr, &g_TexPShader);
 	if (FAILED(hr))
 	{
 		return;
@@ -258,7 +276,7 @@ void SceneManager::Render(HWND hwnd)
 
 	XMMATRIX matView, matProj;
 
-	static XMVECTOR camPos = XMVectorSet(0.0f, 2.0f, -5.0f, 0.0f);
+	static XMVECTOR camPos = XMVectorSet(0.0f, 3.0f, -5.0f, 0.0f);
 	UpdateCameraPosition(camPos);
 
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
@@ -279,8 +297,6 @@ void SceneManager::Render(HWND hwnd)
 
 	g_devcontext->RSSetViewports(1, &vp);
 
-	g_devcontext->VSSetShader(g_vertexShader, nullptr, NULL);
-	g_devcontext->PSSetShader(g_pixelShader, nullptr, NULL);
 	g_devcontext->VSSetConstantBuffers(0, 1, &g_cbuffer);
 	g_devcontext->UpdateSubresource(g_cbuffer, 0, 0, &cbuffer, 0, 0);
 
@@ -289,7 +305,7 @@ void SceneManager::Render(HWND hwnd)
 	g_devcontext->OMSetRenderTargets(1, &g_RTV, nullptr);
 
 
-	for (auto it = cubes.begin(); it != cubes.end(); ++it)
+	for (auto it = models.begin(); it != models.end(); ++it)
 	{
 		(*it)->Render();
 	}
@@ -300,7 +316,7 @@ void SceneManager::Render(HWND hwnd)
 
 D3DCONTEXT SceneManager::GetContext()
 {
-	return{ g_device, g_devcontext, g_vertexShader, g_pixelShader};
+	return{ g_device, g_devcontext};
 }
 
 void SceneManager::SafeRelease(IUnknown *object)

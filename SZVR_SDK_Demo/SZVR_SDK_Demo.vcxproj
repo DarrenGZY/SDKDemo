@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Scene\Model.h" />
     <ClInclude Include="Scene\Plane.h" />
     <ClInclude Include="Scene\Cube.h" />
     <ClInclude Include="Scene\Scene.h" />
@@ -87,6 +88,7 @@
     <ClInclude Include="Util\WICTextureLoader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Scene\Model.cpp" />
     <ClCompile Include="Scene\Plane.cpp" />
     <ClCompile Include="Scene\Cube.cpp" />
     <ClCompile Include="main.cpp" />

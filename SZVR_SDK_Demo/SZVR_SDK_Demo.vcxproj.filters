@@ -30,6 +30,9 @@
     <ClCompile Include="Scene\Plane.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\Model.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\Scene.h">
@@ -45,6 +48,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Scene\Plane.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\Model.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

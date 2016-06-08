@@ -2,6 +2,8 @@
 
 //#include "../Types.h"
 #include "Cube.h"
+#include "Plane.h"
+#include "Model.h"
 #include <vector>
 
 class SceneManager
@@ -31,9 +33,13 @@ private:
 	ID3D11Buffer *g_vbuffer;					// Vertex Buffer
 	ID3D11VertexShader *g_vertexShader;			// Vertex Shader
 	ID3D11PixelShader *g_pixelShader;			// Pixel Shader
+
+	ID3D11VertexShader *g_TexVShader;			// Vertex Shader for texture
+	ID3D11PixelShader *g_TexPShader;			// Pixel Shader for texture
+
 	ID3D11InputLayout *g_inputLayout;			// Input Layout
 	ID3D11SamplerState *g_Sampler;				// Sampler for Pixel Shader
 
-	std::vector<Cube*> cubes;
+	std::vector<Model*> models;
 };
 

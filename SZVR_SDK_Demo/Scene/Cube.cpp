@@ -3,11 +3,14 @@
 #define CUBE_INDICES 36
 
 Cube::Cube(D3DCONTEXT context)
+	:
+	m_ibuffer(nullptr),
+	m_vbuffer(nullptr),
+	m_inputLayout(nullptr),
+	m_vShader(nullptr),
+	m_pShader(nullptr)
 {
 	m_context = context;
-	m_ibuffer = nullptr;
-	m_vbuffer = nullptr;
-	m_inputLayout = nullptr;
 }
 
 void Cube::Create(float x1, float y1, float z1, float x2, float y2, float z2, XMFLOAT4 color)
@@ -122,7 +125,17 @@ void Cube::Render()
 	m_context.devcontext->IASetIndexBuffer(m_ibuffer, DXGI_FORMAT_R32_UINT, 0);
 	m_context.devcontext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+	m_context.devcontext->VSSetShader(m_vShader, nullptr, NULL);
+	m_context.devcontext->PSSetShader(m_pShader, nullptr, NULL);
+
+
 	m_context.devcontext->DrawIndexed(CUBE_INDICES, 0, 0);
+}
+
+void Cube::SetShaders(ID3D11VertexShader *vs, ID3D11PixelShader *ps)
+{
+	m_vShader = vs;
+	m_pShader = ps;
 }
 
 Cube::~Cube()

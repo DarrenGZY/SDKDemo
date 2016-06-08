@@ -37,8 +37,6 @@ typedef struct _D3DCONTEXT
 {
 	ID3D11Device *device;						// Device
 	ID3D11DeviceContext *devcontext;			// Device Context
-	ID3D11VertexShader *vertexShader;			// Vertex Shader
-	ID3D11PixelShader *pixelShader;			// Pixel Shader
 }D3DCONTEXT;
 
 // void SafeRelease(IUnknown *object)
