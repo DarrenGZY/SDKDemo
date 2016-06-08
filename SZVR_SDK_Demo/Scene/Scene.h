@@ -12,6 +12,7 @@ public:
 	SceneManager();
 	void Init(HWND hwnd);
 	void Render(HWND hwnd);
+	void Present();
 	D3DCONTEXT GetContext();
 	~SceneManager();
 

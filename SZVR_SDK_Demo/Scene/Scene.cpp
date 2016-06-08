@@ -212,24 +212,25 @@ void SceneManager::Init(HWND hwnd)
 
 void SceneManager::InitGraphics()
 {
-	
-	Model* plane = new Plane(GetContext());
+	D3DCONTEXT context = GetContext();
+
+	Model* plane = new Plane(context);
 	plane->Create(-10.0f, -1.0f, 10.0f, 10.0f, -1.1f, -10.0f, L"floor.jpg");
 	plane->SetShaders(g_TexVShader, g_TexPShader);
 	models.push_back(plane);
 
-	Model* wall_left = new Plane(GetContext());
-	wall_left->Create(-10.1f, 10.0f, 10.0f, -10.0f, -1.1f, -10.0f, L"wall.jpg");
+	Model* wall_left = new Plane(context);
+	wall_left->Create(-10.1f, 10.0f, 10.0f, -10.0f, -1.1f, -10.0f, L"wall1.jpg");
 	wall_left->SetShaders(g_TexVShader, g_TexPShader);
 	models.push_back(wall_left);
 
-	Model* wall_right = new Plane(GetContext());
-	wall_right->Create(10.0f, 10.0f, 10.0f, 10.1f, -1.1f, -10.0f, L"wall.jpg");
+	Model* wall_right = new Plane(context);
+	wall_right->Create(10.0f, 10.0f, 10.0f, 10.1f, -1.1f, -10.0f, L"wall1.jpg");
 	wall_right->SetShaders(g_TexVShader, g_TexPShader);
 	models.push_back(wall_right);
 
-	Model* cube = new Cube(GetContext());
-	cube->Create(-1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, XMFLOAT4(0.0f, 0.2f, 0.4f, 1.0f));
+	Model* cube = new Cube(context);
+	cube->Create(-1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, XMFLOAT4(1.0f, 0.2f, 0.4f, 1.0f));
 	cube->SetShaders(g_vertexShader, g_pixelShader); 
 	models.push_back(cube);
 
@@ -310,9 +311,12 @@ void SceneManager::Render(HWND hwnd)
 		(*it)->Render();
 	}
 
+	}
+
+void SceneManager::Present()
+{
 	g_swapchain->Present(1, 0);
 }
-
 
 D3DCONTEXT SceneManager::GetContext()
 {
