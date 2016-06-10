@@ -59,5 +59,7 @@
     <FxCompile Include="Shaders\VertexShader.hlsl" />
     <FxCompile Include="Shaders\TexVShader.hlsl" />
     <FxCompile Include="Shaders\TexPShader.hlsl" />
+    <FxCompile Include="Shaders\BaseVShader.hlsl" />
+    <FxCompile Include="Shaders\BasePShader.hlsl" />
   </ItemGroup>
 </Project>

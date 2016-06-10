@@ -38,42 +38,43 @@ void Plane::Create(float x1, float y1, float z1, float x2, float y2, float z2, c
 	D3D11_INPUT_ELEMENT_DESC Layout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 	UINT NumElements = ARRAYSIZE(Layout);
 	m_context.device->CreateInputLayout(Layout, NumElements, g_VS, ARRAYSIZE(g_VS), &m_inputLayout);
 
 	TEXVERTEX vertices[] =
 	{
-		{ XMFLOAT3(x1, y1, z2), XMFLOAT2(0.0f, 0.0f) },	// front side
-		{ XMFLOAT3(x2, y1, z2), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(x1, y2, z2), XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(x2, y2, z2), XMFLOAT2(1.0f, 1.0f) },
+		{ XMFLOAT3(x1, y1, z2), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },	// front side
+		{ XMFLOAT3(x2, y1, z2), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(x1, y2, z2), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(x2, y2, z2), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f) },
 
-		{ XMFLOAT3(x1, y1, z1), XMFLOAT2(0.0f, 0.0f) },	// back side
-		{ XMFLOAT3(x1, y2, z1), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(x2, y1, z1), XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(x2, y2, z1), XMFLOAT2(1.0f, 1.0f) },
+		{ XMFLOAT3(x1, y1, z1), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },	// back side
+		{ XMFLOAT3(x1, y2, z1), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
+		{ XMFLOAT3(x2, y1, z1), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
+		{ XMFLOAT3(x2, y2, z1), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f) },
 
-		{ XMFLOAT3(x1, y2, z1), XMFLOAT2(0.0f, 0.0f) },	// top side
-		{ XMFLOAT3(x1, y2, z2), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(x2, y2, z1), XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(x2, y2, z2), XMFLOAT2(1.0f, 1.0f) },
+		{ XMFLOAT3(x1, y2, z1), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },	// top side
+		{ XMFLOAT3(x1, y2, z2), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+		{ XMFLOAT3(x2, y2, z1), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
+		{ XMFLOAT3(x2, y2, z2), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f) },
 
-		{ XMFLOAT3(x1, y1, z1), XMFLOAT2(0.0f, 0.0f) },	// bottom side
-		{ XMFLOAT3(x2, y1, z1), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(x1, y1, z2), XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(x2, y1, z2), XMFLOAT2(1.0f, 1.0f) },
+		{ XMFLOAT3(x1, y1, z1), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },	// bottom side
+		{ XMFLOAT3(x2, y1, z1), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
+		{ XMFLOAT3(x1, y1, z2), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
+		{ XMFLOAT3(x2, y1, z2), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f) },
 
-		{ XMFLOAT3(x2, y1, z1), XMFLOAT2(0.0f, 0.0f) },	// right side
-		{ XMFLOAT3(x2, y2, z1), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(x2, y1, z2), XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(x2, y2, z2), XMFLOAT2(1.0f, 1.0f) },
+		{ XMFLOAT3(x2, y1, z1), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },	// right side
+		{ XMFLOAT3(x2, y2, z1), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
+		{ XMFLOAT3(x2, y1, z2), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
+		{ XMFLOAT3(x2, y2, z2), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f) },
 
-		{ XMFLOAT3(x1, y1, z1), XMFLOAT2(0.0f, 0.0f) },	// left side
-		{ XMFLOAT3(x1, y1, z2), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(x1, y2, z1), XMFLOAT2(1.0f, 0.0f) },
-		{ XMFLOAT3(x1, y2, z2), XMFLOAT2(1.0f, 1.0f) },
+		{ XMFLOAT3(x1, y1, z1), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },	// left side
+		{ XMFLOAT3(x1, y1, z2), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
+		{ XMFLOAT3(x1, y2, z1), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
+		{ XMFLOAT3(x1, y2, z2), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f) },
 	};
 
 

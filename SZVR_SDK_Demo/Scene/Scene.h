@@ -12,6 +12,7 @@ public:
 	SceneManager();
 	void Init(HWND hwnd);
 	void Render(HWND hwnd);
+	void DistortionRender();
 	void Present();
 	D3DCONTEXT GetContext();
 	~SceneManager();
@@ -19,6 +20,7 @@ public:
 private:
 	void InitGraphics();
 	void InitShaders();
+	void DistortionInit();
 	void SafeRelease(IUnknown *object);
 
 private:
@@ -34,6 +36,8 @@ private:
 	ID3D11Buffer *g_vbuffer;					// Vertex Buffer
 	ID3D11VertexShader *g_vertexShader;			// Vertex Shader
 	ID3D11PixelShader *g_pixelShader;			// Pixel Shader
+
+	ID3D11Texture2D *g_renderTarget;
 
 	ID3D11VertexShader *g_TexVShader;			// Vertex Shader for texture
 	ID3D11PixelShader *g_TexPShader;			// Pixel Shader for texture

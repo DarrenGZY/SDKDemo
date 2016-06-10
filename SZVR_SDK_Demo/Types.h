@@ -13,6 +13,9 @@ using namespace DirectX;
 typedef struct _CBUFFER
 {
 	XMMATRIX final;
+	XMFLOAT4 LightVector;
+	XMFLOAT4 LightColor;
+	XMFLOAT4 AmbientColor;
 }CBUFFER;
 
 typedef struct _VERTEX
@@ -25,12 +28,14 @@ typedef struct _SOLIDVERTEX
 {
 	XMFLOAT3 Pos;
 	XMFLOAT4 Color;
+	XMFLOAT3 Normal;
 }SOLIDVERTEX;
 
 typedef struct _TEXVERTEX
 {
 	XMFLOAT3 Pos;
 	XMFLOAT2 Tex;
+	XMFLOAT3 Normal;
 }TEXVERTEX;
 
 typedef struct _D3DCONTEXT

@@ -116,18 +116,20 @@ void SceneManager::Init(HWND hwnd)
 	///////////////////////////////////////////////////////
 	//Create Render Target View
 	///////////////////////////////////////////////////////
+	D3D11_TEXTURE2D_DESC desc;
+	ZeroMemory(&desc, sizeof(desc));
+	desc.Width = Width;
+	desc.Height = Height;
+	desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	desc.SampleDesc.Count = 1;
 
-	// Get backbuffer
-	ID3D11Texture2D* backbuffer = nullptr;
-	hr = g_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backbuffer));
-	if (FAILED(hr))
-	{
-		return;
-	}
+	g_device->CreateTexture2D(&desc, nullptr, &g_renderTarget);
 
-	hr = g_device->CreateRenderTargetView(backbuffer, nullptr, &g_RTV);
-
-	SafeRelease(backbuffer);
+	hr = g_device->CreateRenderTargetView(g_renderTarget, nullptr, &g_RTV);
 
 	if (FAILED(hr))
 	{
@@ -265,6 +267,72 @@ void SceneManager::InitShaders()
 	}
 }
 
+void SceneManager::DistortionInit()
+{
+	HRESULT hr;
+
+	///////////////////////////////////////////////////////
+	//Create Input Layout
+	///////////////////////////////////////////////////////
+	D3D11_INPUT_ELEMENT_DESC Layout[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+	UINT NumElements = ARRAYSIZE(Layout);
+	hr = g_device->CreateInputLayout(Layout, NumElements, g_VS, ARRAYSIZE(g_VS), &g_inputLayout);
+
+
+	///////////////////////////////////////////////////////
+	//Create Vertex Buffer
+	///////////////////////////////////////////////////////
+	VERTEX Vertices[] =
+	{
+		{ XMFLOAT3(-1.78f, -1.0f, 0), XMFLOAT2(0.0f, 1.0f) },
+		{ XMFLOAT3(-1.78f, 1.0f, 0), XMFLOAT2(0.0f, 0.0f) },
+		{ XMFLOAT3(1.78f, -1.0f, 0), XMFLOAT2(1.0f, 1.0f) },
+		{ XMFLOAT3(1.78f, 1.0f, 0), XMFLOAT2(1.0f, 0.0f) },
+	};
+
+	D3D11_BUFFER_DESC bufferDesc;
+	ZeroMemory(&bufferDesc, sizeof(bufferDesc));
+	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	bufferDesc.ByteWidth = sizeof(VERTEX)*ARRAYSIZE(Vertices);
+	bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bufferDesc.CPUAccessFlags = 0;
+	D3D11_SUBRESOURCE_DATA InitData;
+	ZeroMemory(&InitData, sizeof(InitData));
+	InitData.pSysMem = Vertices;
+
+	hr = g_device->CreateBuffer(&bufferDesc, &InitData, &g_vbuffer);
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	///////////////////////////////////////////////////////
+	//Create Index Buffer
+	///////////////////////////////////////////////////////
+	DWORD Indices[] =
+	{
+		0, 1, 2,
+		2, 1, 3
+	};
+
+	ZeroMemory(&bufferDesc, sizeof(bufferDesc));
+	bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	bufferDesc.ByteWidth = sizeof(DWORD)*ARRAYSIZE(Indices);
+	bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	bufferDesc.CPUAccessFlags = 0;
+	ZeroMemory(&InitData, sizeof(InitData));
+	InitData.pSysMem = Indices;
+
+	hr = g_device->CreateBuffer(&bufferDesc, &InitData, &g_ibuffer);
+	if (FAILED(hr))
+	{
+		return;
+	}
+}
 
 void SceneManager::Render(HWND hwnd)
 {
@@ -287,6 +355,9 @@ void SceneManager::Render(HWND hwnd)
 	matProj = XMMatrixPerspectiveFovLH(XMConvertToRadians(110), (FLOAT)Width / (FLOAT)Height, 0.5f, 100.0f);
 
 	cbuffer.final = matView*matProj;
+	cbuffer.LightVector = XMFLOAT4(0.0f, 0.3f, 1.0f, 0.0f);
+	cbuffer.LightColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	cbuffer.AmbientColor = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 
 	D3D11_VIEWPORT vp;
 	vp.Width = (FLOAT)Width;
@@ -311,7 +382,12 @@ void SceneManager::Render(HWND hwnd)
 		(*it)->Render();
 	}
 
-	}
+}
+
+void SceneManager::DistortionRender()
+{
+
+}
 
 void SceneManager::Present()
 {

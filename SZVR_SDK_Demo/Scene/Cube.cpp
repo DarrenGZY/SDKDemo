@@ -37,42 +37,43 @@ void Cube::Create(float x1, float y1, float z1, float x2, float y2, float z2, XM
 	D3D11_INPUT_ELEMENT_DESC Layout[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 28, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 	UINT NumElements = ARRAYSIZE(Layout);
 	m_context.device->CreateInputLayout(Layout, NumElements, g_VS, ARRAYSIZE(g_VS), &m_inputLayout);
 
 	SOLIDVERTEX vertices[] =
 	{
-		{ XMFLOAT3(x1, y1, z2), color },	// front side
-		{ XMFLOAT3(x2, y1, z2), color },
-		{ XMFLOAT3(x1, y2, z2), color },
-		{ XMFLOAT3(x2, y2, z2), color },
+		{ XMFLOAT3(x1, y1, z2), color, XMFLOAT3(0.0f, 0.0f, 1.0f) },	// front side
+		{ XMFLOAT3(x2, y1, z2), color, XMFLOAT3(0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(x1, y2, z2), color, XMFLOAT3(0.0f, 0.0f, 1.0f) },
+		{ XMFLOAT3(x2, y2, z2), color, XMFLOAT3(0.0f, 0.0f, 1.0f) },
 
-		{ XMFLOAT3(x1, y1, z1), color },	// back side
-		{ XMFLOAT3(x1, y2, z1), color },
-		{ XMFLOAT3(x2, y1, z1), color },
-		{ XMFLOAT3(x2, y2, z1), color },
+		{ XMFLOAT3(x1, y1, z1), color, XMFLOAT3(0.0f, 0.0f, -1.0f) },	// back side
+		{ XMFLOAT3(x1, y2, z1), color, XMFLOAT3(0.0f, 0.0f, -1.0f) },
+		{ XMFLOAT3(x2, y1, z1), color, XMFLOAT3(0.0f, 0.0f, -1.0f) },
+		{ XMFLOAT3(x2, y2, z1), color, XMFLOAT3(0.0f, 0.0f, -1.0f) },
 
-		{ XMFLOAT3(x1, y2, z1), color },	// top side
-		{ XMFLOAT3(x1, y2, z2), color },
-		{ XMFLOAT3(x2, y2, z1), color },
-		{ XMFLOAT3(x2, y2, z2), color },
+		{ XMFLOAT3(x1, y2, z1), color, XMFLOAT3(0.0f, 1.0f, 0.0f) },	// top side
+		{ XMFLOAT3(x1, y2, z2), color, XMFLOAT3(0.0f, 1.0f, 0.0f) },
+		{ XMFLOAT3(x2, y2, z1), color, XMFLOAT3(0.0f, 1.0f, 0.0f) },
+		{ XMFLOAT3(x2, y2, z2), color, XMFLOAT3(0.0f, 1.0f, 0.0f) },
 
-		{ XMFLOAT3(x1, y1, z1), color },	// bottom side
-		{ XMFLOAT3(x2, y1, z1), color },
-		{ XMFLOAT3(x1, y1, z2), color },
-		{ XMFLOAT3(x2, y1, z2), color },
+		{ XMFLOAT3(x1, y1, z1), color, XMFLOAT3(0.0f, -1.0f, 0.0f) },	// bottom side
+		{ XMFLOAT3(x2, y1, z1), color, XMFLOAT3(0.0f, -1.0f, 0.0f) },
+		{ XMFLOAT3(x1, y1, z2), color, XMFLOAT3(0.0f, -1.0f, 0.0f) },
+		{ XMFLOAT3(x2, y1, z2), color, XMFLOAT3(0.0f, -1.0f, 0.0f) },
 
-		{ XMFLOAT3(x2, y1, z1), color },	// right side
-		{ XMFLOAT3(x2, y2, z1), color },
-		{ XMFLOAT3(x2, y1, z2), color },
-		{ XMFLOAT3(x2, y2, z2), color },
+		{ XMFLOAT3(x2, y1, z1), color, XMFLOAT3(1.0f, 0.0f, 0.0f) },	// right side
+		{ XMFLOAT3(x2, y2, z1), color, XMFLOAT3(1.0f, 0.0f, 0.0f) },
+		{ XMFLOAT3(x2, y1, z2), color, XMFLOAT3(1.0f, 0.0f, 0.0f) },
+		{ XMFLOAT3(x2, y2, z2), color, XMFLOAT3(1.0f, 0.0f, 0.0f) },
 
-		{ XMFLOAT3(x1, y1, z1), color },	// left side
-		{ XMFLOAT3(x1, y1, z2), color },
-		{ XMFLOAT3(x1, y2, z1), color },
-		{ XMFLOAT3(x1, y2, z2), color },
+		{ XMFLOAT3(x1, y1, z1), color, XMFLOAT3(-1.0f, 0.0f, 0.0f) },	// left side
+		{ XMFLOAT3(x1, y1, z2), color, XMFLOAT3(-1.0f, 0.0f, 0.0f) },
+		{ XMFLOAT3(x1, y2, z1), color, XMFLOAT3(-1.0f, 0.0f, 0.0f) },
+		{ XMFLOAT3(x1, y2, z2), color, XMFLOAT3(-1.0f, 0.0f, 0.0f) },
 	};
 
 
