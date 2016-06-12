@@ -42,7 +42,7 @@ void Plane::Create(float x1, float y1, float z1, float x2, float y2, float z2, c
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 	UINT NumElements = ARRAYSIZE(Layout);
-	m_context.device->CreateInputLayout(Layout, NumElements, g_VS, ARRAYSIZE(g_VS), &m_inputLayout);
+	HRESULT hr = m_context.device->CreateInputLayout(Layout, NumElements, g_TexVS, ARRAYSIZE(g_TexVS), &m_inputLayout);
 
 	TEXVERTEX vertices[] =
 	{
@@ -116,7 +116,7 @@ void Plane::Create(float x1, float y1, float z1, float x2, float y2, float z2, c
 
 	m_context.device->CreateBuffer(&BufferDesc, &InitData, &m_ibuffer);
 
-	HRESULT hr	= CreateWICTextureFromFile(m_context.device, m_context.devcontext, filename, nullptr, &m_SRV, NULL);
+	hr	= CreateWICTextureFromFile(m_context.device, m_context.devcontext, filename, nullptr, &m_SRV, NULL);
 	
 }
 

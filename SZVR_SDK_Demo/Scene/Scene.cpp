@@ -17,6 +17,13 @@ SceneManager::SceneManager()
 	g_pixelShader = nullptr;
 	g_inputLayout = nullptr;
 	g_Sampler = nullptr;
+	g_TexRTV = nullptr;
+	g_TexPShader = nullptr;
+	g_TexVShader = nullptr;
+	g_distortVBuffer = nullptr;
+	g_distortPShader = nullptr;
+	g_distortVShader = nullptr;
+	g_distortIBuffer = nullptr;
 }
 
 
@@ -102,7 +109,7 @@ void SceneManager::Init(HWND hwnd)
 	SwapChainDesc.BufferCount = 2;
 	SwapChainDesc.Width = Width;
 	SwapChainDesc.Height = Height;
-	SwapChainDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	SwapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	SwapChainDesc.SampleDesc.Count = 1;
 	SwapChainDesc.SampleDesc.Quality = 0;
@@ -127,15 +134,45 @@ void SceneManager::Init(HWND hwnd)
 	desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	desc.SampleDesc.Count = 1;
 
-	g_device->CreateTexture2D(&desc, nullptr, &g_renderTarget);
+	hr = g_device->CreateTexture2D(&desc, nullptr, &g_renderTarget);
 
-	hr = g_device->CreateRenderTargetView(g_renderTarget, nullptr, &g_RTV);
+	D3D11_RENDER_TARGET_VIEW_DESC rtDesc;
+	rtDesc.Format = desc.Format;
+	rtDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	rtDesc.Texture2D.MipSlice = 0;
+
+	hr = g_device->CreateRenderTargetView(g_renderTarget, nullptr, &g_TexRTV);
 
 	if (FAILED(hr))
 	{
 		return;
 	}
 
+	ID3D11Texture2D* backbuffer = nullptr;
+	hr = g_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backbuffer));
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	hr = g_device->CreateRenderTargetView(backbuffer, nullptr, &g_RTV);
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	SafeRelease(backbuffer);
+
+//	D3D11_TEXTURE2D_DESC desc;
+//	g_renderTarget->GetDesc(&desc);
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC shaderDesc;
+	shaderDesc.Format = desc.Format;
+	shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	shaderDesc.Texture2D.MostDetailedMip = desc.MipLevels - 1;
+	shaderDesc.Texture2D.MipLevels = desc.MipLevels;
+
+	hr = g_device->CreateShaderResourceView(g_renderTarget, &shaderDesc, &g_SRV);
 	///////////////////////////////////////////////////////
 	//Create Depth Stencil View
 	///////////////////////////////////////////////////////
@@ -208,7 +245,7 @@ void SceneManager::Init(HWND hwnd)
 
 	InitShaders();
 	InitGraphics();
-	
+	DistortionInit();
 }
 
 
@@ -232,7 +269,7 @@ void SceneManager::InitGraphics()
 	models.push_back(wall_right);
 
 	Model* cube = new Cube(context);
-	cube->Create(-1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, XMFLOAT4(1.0f, 0.2f, 0.4f, 1.0f));
+	cube->Create(-1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, XMFLOAT4(0.0f, 0.2f, 0.2f, 1.0f));
 	cube->SetShaders(g_vertexShader, g_pixelShader); 
 	models.push_back(cube);
 
@@ -265,6 +302,18 @@ void SceneManager::InitShaders()
 	{
 		return;
 	}
+
+	hr = g_device->CreateVertexShader(g_BVS, ARRAYSIZE(g_BVS), nullptr, &g_distortVShader);
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	hr = g_device->CreatePixelShader(g_BPS, ARRAYSIZE(g_BPS), nullptr, &g_distortPShader);
+	if (FAILED(hr))
+	{
+		return;
+	}
 }
 
 void SceneManager::DistortionInit()
@@ -280,7 +329,7 @@ void SceneManager::DistortionInit()
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 	UINT NumElements = ARRAYSIZE(Layout);
-	hr = g_device->CreateInputLayout(Layout, NumElements, g_VS, ARRAYSIZE(g_VS), &g_inputLayout);
+	hr = g_device->CreateInputLayout(Layout, NumElements, g_BVS, ARRAYSIZE(g_BVS), &g_distortInputLayout);
 
 
 	///////////////////////////////////////////////////////
@@ -288,10 +337,10 @@ void SceneManager::DistortionInit()
 	///////////////////////////////////////////////////////
 	VERTEX Vertices[] =
 	{
-		{ XMFLOAT3(-1.78f, -1.0f, 0), XMFLOAT2(0.0f, 1.0f) },
-		{ XMFLOAT3(-1.78f, 1.0f, 0), XMFLOAT2(0.0f, 0.0f) },
-		{ XMFLOAT3(1.78f, -1.0f, 0), XMFLOAT2(1.0f, 1.0f) },
-		{ XMFLOAT3(1.78f, 1.0f, 0), XMFLOAT2(1.0f, 0.0f) },
+		{ XMFLOAT3(-2.0f, -2.0f, 0), XMFLOAT2(0.0f, 1.0f) },
+		{ XMFLOAT3(-2.0f, 2.0f, 0), XMFLOAT2(0.0f, 0.0f) },
+		{ XMFLOAT3(2.0f, -2.0f, 0), XMFLOAT2(1.0f, 1.0f) },
+		{ XMFLOAT3(2.0f, 2.0f, 0), XMFLOAT2(1.0f, 0.0f) },
 	};
 
 	D3D11_BUFFER_DESC bufferDesc;
@@ -304,7 +353,7 @@ void SceneManager::DistortionInit()
 	ZeroMemory(&InitData, sizeof(InitData));
 	InitData.pSysMem = Vertices;
 
-	hr = g_device->CreateBuffer(&bufferDesc, &InitData, &g_vbuffer);
+	hr = g_device->CreateBuffer(&bufferDesc, &InitData, &g_distortVBuffer);
 	if (FAILED(hr))
 	{
 		return;
@@ -327,11 +376,13 @@ void SceneManager::DistortionInit()
 	ZeroMemory(&InitData, sizeof(InitData));
 	InitData.pSysMem = Indices;
 
-	hr = g_device->CreateBuffer(&bufferDesc, &InitData, &g_ibuffer);
+	hr = g_device->CreateBuffer(&bufferDesc, &InitData, &g_distortIBuffer);
 	if (FAILED(hr))
 	{
 		return;
 	}
+
+	//hr = CreateWICTextureFromFile(g_device, g_devcontext, L"floor.jpg", nullptr, &g_SRV, NULL);  //Debug only
 }
 
 void SceneManager::Render(HWND hwnd)
@@ -355,7 +406,7 @@ void SceneManager::Render(HWND hwnd)
 	matProj = XMMatrixPerspectiveFovLH(XMConvertToRadians(110), (FLOAT)Width / (FLOAT)Height, 0.5f, 100.0f);
 
 	cbuffer.final = matView*matProj;
-	cbuffer.LightVector = XMFLOAT4(0.0f, 0.3f, 1.0f, 0.0f);
+	cbuffer.LightVector = XMFLOAT4(-0.3f, 0.3f, 0.0f, 0.0f);
 	cbuffer.LightColor = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 	cbuffer.AmbientColor = XMFLOAT4(0.2f, 0.2f, 0.2f, 1.0f);
 
@@ -366,7 +417,7 @@ void SceneManager::Render(HWND hwnd)
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0;
 	vp.TopLeftY = 0;
-
+	g_devcontext->ClearDepthStencilView(g_zbuffer, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	g_devcontext->RSSetViewports(1, &vp);
 
 	g_devcontext->VSSetConstantBuffers(0, 1, &g_cbuffer);
@@ -374,19 +425,33 @@ void SceneManager::Render(HWND hwnd)
 
 	g_devcontext->PSSetSamplers(0, 1, &g_Sampler);
 
-	g_devcontext->OMSetRenderTargets(1, &g_RTV, nullptr);
-
+	g_devcontext->OMSetRenderTargets(1, &g_TexRTV, g_zbuffer);
 
 	for (auto it = models.begin(); it != models.end(); ++it)
 	{
 		(*it)->Render();
 	}
-
 }
 
 void SceneManager::DistortionRender()
 {
+	FLOAT color[4] = { 0.0f, 0.2f, 0.4f, 1.0f };
+	g_devcontext->ClearRenderTargetView(g_TexRTV, color);
+	g_devcontext->ClearRenderTargetView(g_RTV, color);
+	g_devcontext->ClearDepthStencilView(g_zbuffer, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	g_devcontext->IASetInputLayout(g_distortInputLayout);
+	UINT stride = sizeof(VERTEX);
+	UINT offset = 0;
+	g_devcontext->IASetVertexBuffers(0, 1, &g_distortVBuffer, &stride, &offset);
+	g_devcontext->IASetIndexBuffer(g_distortIBuffer, DXGI_FORMAT_R32_UINT, 0);
+	g_devcontext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	g_devcontext->VSSetShader(g_distortVShader, nullptr, NULL);
+	g_devcontext->PSSetShader(g_distortPShader, nullptr, NULL);
+	g_devcontext->PSSetShaderResources(0, 1, &g_SRV);
 
+	g_devcontext->OMSetRenderTargets(1, &g_RTV, g_zbuffer);
+
+	g_devcontext->DrawIndexed(6, 0, 0);
 }
 
 void SceneManager::Present()

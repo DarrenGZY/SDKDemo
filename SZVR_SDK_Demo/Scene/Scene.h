@@ -38,12 +38,20 @@ private:
 	ID3D11PixelShader *g_pixelShader;			// Pixel Shader
 
 	ID3D11Texture2D *g_renderTarget;
+	ID3D11RenderTargetView *g_TexRTV;
 
 	ID3D11VertexShader *g_TexVShader;			// Vertex Shader for texture
 	ID3D11PixelShader *g_TexPShader;			// Pixel Shader for texture
 
 	ID3D11InputLayout *g_inputLayout;			// Input Layout
 	ID3D11SamplerState *g_Sampler;				// Sampler for Pixel Shader
+
+	// Distortion Render
+	ID3D11VertexShader *g_distortVShader;
+	ID3D11PixelShader *g_distortPShader;
+	ID3D11InputLayout *g_distortInputLayout;
+	ID3D11Buffer *g_distortIBuffer;
+	ID3D11Buffer *g_distortVBuffer;
 
 	std::vector<Model*> models;
 };

@@ -7,6 +7,8 @@
 #include "VertexShader.h"
 #include "TexVShader.h"
 #include "TexPShader.h"
+#include "BasePShader.h"
+#include "BaseVShader.h"
 
 using namespace DirectX;
 

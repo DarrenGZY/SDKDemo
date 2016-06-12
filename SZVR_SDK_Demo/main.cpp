@@ -61,6 +61,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int nCmdShow
 		}
 
 		mgr.Render(hwnd);
+		mgr.DistortionRender();
 		mgr.Present();
 		/*tester.Render(hwnd);*/
 	}

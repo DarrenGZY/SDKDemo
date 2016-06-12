@@ -31,6 +31,6 @@ VS_OUTPUT main(VS_INPUT input)
 	output.Tex = input.Tex;
 	
 	float diffusebrightness = saturate(dot(input.Nor, lightvec));
-	output.Col = lightcol * diffusebrightness;
+	output.Col = lightcol * diffusebrightness + ambientcol;
 	return output;
 }

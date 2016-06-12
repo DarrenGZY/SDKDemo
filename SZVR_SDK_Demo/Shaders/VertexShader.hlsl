@@ -44,6 +44,6 @@ VS_OUTPUT main(VS_INPUT input)
 	output.Col = input.Col;
 	
 	float diffusebrightness = saturate(dot(input.Nor, lightvec));
-	output.Col += lightcol * diffusebrightness;
+	output.Col += lightcol * diffusebrightness + ambientcol;
 	return output;
 }
